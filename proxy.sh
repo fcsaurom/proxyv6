@@ -30,7 +30,7 @@ gen_3proxy() {
 daemon
 maxconn 10048
 nserver 1.1.1.1
-nserver 8.8.4.4
+nserver 8.8.4.4.4
 nserver 2001:4860:4860::8888
 nserver 2001:4860:4860::8844
 nscache 65536
@@ -40,10 +40,9 @@ setuid 65535
 stacksize 6291456 
 flush
 authcache user 86400
-auth none cache
-auth iponly cache
-allow 14.224.163.75
-deny *
+users username:CL:password
+auth strong
+allow username
 
 $(awk -F "/" '{print "\n" \
 "allow *" $1 "\n" \
@@ -54,7 +53,7 @@ EOF
 
 gen_proxy_file_for_user() {
     cat >proxy.txt <<EOF
-$(awk -F "/" '{print $3 ":" $4}' ${WORKDATA})
+$(awk -F "/" '{print $3 ":" $4 ":username:password"}' ${WORKDATA})
 EOF
 }
 
@@ -96,16 +95,11 @@ rotate_ipv6() {
 }
 
 download_proxy() {
-    cd $WORKDIR || exit 1
-    local PASS="123"
-	  zip --password $PASS ok.zip proxy.txt
-	  JSON=$(curl -F "file=@ok.zip" https://file.io)
-	  URL=$(echo "$JSON" | jq --raw-output '.link')
-
-	  echo "Proxy is ready! Format IP:PORT:LOGIN:PASS"
-	  echo "Duong dan file proxy: /home/proxy-installer/proxy.txt"
-	  echo "Download zip archive from: ${URL}"
-	  echo "Password: ${PASS}"
+	cd $WORKDIR || exit 1
+    JSON=$(curl -F "proxy.txt" https://file.io)
+    URL=$(echo "$JSON" | jq --raw-output '.link')
+    echo "Duong dan file proxy: /home/proxy-installer/proxy.txt"
+    echo "Download zip archive from: ${URL}"
 }
 
 echo "working folder = /home/proxy-installer"
