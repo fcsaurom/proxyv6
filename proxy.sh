@@ -97,7 +97,7 @@ rotate_ipv6() {
 
 download_proxy() {
     cd $WORKDIR || exit 1
-    JSON=$(curl -F "proxy.txt" https://file.io)
+    JSON=$(curl -F "file=@proxy.txt" https://file.io)
 	URL=$(echo "$JSON" | jq --raw-output '.link')
 	echo "Duong dan file proxy: /home/proxy-installer/proxy.txt"
 	echo "Download proxy: ${URL}"
