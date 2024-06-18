@@ -97,11 +97,27 @@ rotate_ipv6() {
 
 download_proxy() {
     cd $WORKDIR || exit 1
-    JSON=$(curl -F "file=@proxy.txt" https://file.io)
-	URL=$(echo "$JSON" | jq --raw-output '.link')
-	echo "Duong dan file proxy: /home/proxy-installer/proxy.txt"
-	echo "Download proxy: ${URL}"
+	local PASS="123"
+    echo "Uploading proxy.txt to file.io"
+	zip --password $PASS ok.zip proxy.txt
+    JSON=$(curl -F "file=@ok.zip" https://file.io)
+    # Kiểm tra lỗi khi upload
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to upload proxy.txt"
+        exit 1
+    fi
+    URL=$(echo "$JSON" | jq --raw-output '.link')
+    # Kiểm tra lỗi khi sử dụng jq
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to parse JSON"
+        echo "Error: Failed to parse JSON"
+        exit 1
+    fi
+    echo "Đường dẫn file proxy: /home/proxy-installer/proxy.txt"
+    echo "Download proxy: ${URL}"
+	echo "Password: ${PASS}"
 }
+
 
 echo "working folder = /home/proxy-installer"
 WORKDIR="/home/proxy-installer"
