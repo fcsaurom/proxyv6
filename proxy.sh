@@ -40,9 +40,9 @@ setuid 65535
 stacksize 6291456 
 flush
 authcache user 86400
-auth none cache
-auth iponly cache
-allow 14.224.163.75
+auth strong
+users user:CL:password
+allow user
 deny *
 
 $(awk -F "/" '{print "\n" \
