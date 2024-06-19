@@ -40,9 +40,9 @@ setuid 65535
 stacksize 6291456 
 flush
 authcache user 86400
-auth strong
-users user:CL:password
-allow user
+auth none cache
+auth iponly cache
+allow 14.224.163.75
 deny *
 
 $(awk -F "/" '{print "\n" \
@@ -60,7 +60,7 @@ EOF
 
 gen_data() {
     seq $FIRST_PORT $LAST_PORT | while read port; do
-        echo "zxzxzx/zxzxzx/$IP4/$port/$(gen64 $IP6)"
+        echo "//$IP4/$port/$(gen64 $IP6)"
     done
 }
 
