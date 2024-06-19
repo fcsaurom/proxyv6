@@ -1,6 +1,16 @@
 #!/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
+setup_ipv6() {
+    echo "Thiết lập IPv6..."
+    sudo service 3proxy stop
+    ip -6 addr flush dev eth0
+    sudo systemctl stop firewalld
+    sudo systemctl disable firewalld
+    bash <(curl -s "https://raw.githubusercontent.com/quanglinh0208/3proxy/main/ipv6.sh") 
+}
+setup_ipv6
+
 random() {
     tr </dev/urandom -dc A-Za-z0-9 | head -c5
     echo
@@ -97,35 +107,16 @@ rotate_ipv6() {
 
 download_proxy() {
     cd $WORKDIR || exit 1
-	local PASS="123"
-    echo "Uploading proxy.txt to file.io"
-	zip --password $PASS ok.zip proxy.txt
-    JSON=$(curl -F "file=@ok.zip" https://file.io)
-    # Kiểm tra lỗi khi upload
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to upload proxy.txt"
-        exit 1
-    fi
-    URL=$(echo "$JSON" | jq --raw-output '.link')
-    # Kiểm tra lỗi khi sử dụng jq
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to parse JSON"
-        echo "Error: Failed to parse JSON"
-        exit 1
-    fi
-    echo "Đường dẫn file proxy: /home/proxy-installer/proxy.txt"
-    echo "Download proxy: ${URL}"
-	echo "Password: ${PASS}"
+    curl -F "proxy.txt" https://transfer.sh >/dev/null 2>&1
 }
 
-
-echo "working folder = /home/proxy-installer"
-WORKDIR="/home/proxy-installer"
+echo "working folder = /home/fileProxy"
+WORKDIR="/home/fileProxy"
 WORKDATA="${WORKDIR}/data.txt"
 mkdir $WORKDIR && cd $_
 
 IP4=$(curl -4 -s icanhazip.com)
-IP6=$(curl -6 -s icanhazip.com | cut -f1-4 -d':')
+IP6=$(ip addr show eth0 | grep 'inet6 ' | awk '{print $2}' | cut -f1-4 -d':' | grep '^2')
 
 echo "Internal ip = ${IP4}. Exteranl sub for ip6 = ${IP6}"
 
