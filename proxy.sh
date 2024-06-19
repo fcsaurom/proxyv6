@@ -1,16 +1,6 @@
 #!/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-setup_ipv6() {
-    echo "Thiết lập IPv6..."
-    sudo service 3proxy stop
-    ip -6 addr flush dev eth0
-    sudo systemctl stop firewalld
-    sudo systemctl disable firewalld
-    bash <(curl -s "https://raw.githubusercontent.com/quanglinh0208/3proxy/main/ipv6.sh") 
-}
-setup_ipv6
-
 random() {
     tr </dev/urandom -dc A-Za-z0-9 | head -c5
     echo
@@ -70,7 +60,7 @@ EOF
 
 gen_data() {
     seq $FIRST_PORT $LAST_PORT | while read port; do
-        echo "//$IP4/$port/$(gen64 $IP6)"
+        echo "zxzxzx/zxzxzx/$IP4/$port/$(gen64 $IP6)"
     done
 }
 
@@ -105,18 +95,30 @@ rotate_ipv6() {
     sleep 3600
 }
 
-download_proxy() {
-    cd $WORKDIR || exit 1
-    curl -F "proxy.txt" https://transfer.sh >/dev/null 2>&1
+install_jq() {
+  wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+  chmod +x ./jq
+  cp jq /usr/bin
 }
 
-echo "working folder = /home/fileProxy"
-WORKDIR="/home/fileProxy"
+download_proxy() {
+  local PASS="123"
+  zip --password $PASS proxy.zip proxy.txt
+  JSON=$(curl -F "file=@proxy.zip" https://file.io)
+  URL=$(echo "$JSON" | jq --raw-output '.link')
+
+  echo "Download zip archive from: ${URL}"
+  echo "Password: ${PASS}"
+}
+
+
+echo "working folder = /home/proxy-installer"
+WORKDIR="/home/proxy-installer"
 WORKDATA="${WORKDIR}/data.txt"
 mkdir $WORKDIR && cd $_
 
 IP4=$(curl -4 -s icanhazip.com)
-IP6=$(ip addr show eth0 | grep 'inet6 ' | awk '{print $2}' | cut -f1-4 -d':' | grep '^2')
+IP6=$(curl -6 -s icanhazip.com | cut -f1-4 -d':')
 
 echo "Internal ip = ${IP4}. Exteranl sub for ip6 = ${IP6}"
 
@@ -167,7 +169,7 @@ while true; do
             rotate_ipv6
             ;;
         3)
-            download_proxy
+            install_jq && download_proxy
             ;;
         4)
             echo "Exiting..."
