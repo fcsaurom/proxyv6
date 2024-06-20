@@ -157,8 +157,8 @@ ip -6 addr | grep inet6 | wc -l
 while true; do
     echo "1. Thiết Lập Lại 3proxy"
     echo "2. Xoay IPV6"
-    echo "3. Download proxy"
-    echo "4. Exit"
+    echo "3. Tạo link Download proxy"
+    echo "4. File proxy ở đường dẫn: /home/proxy-installer/proxy.txt"
     echo -n "Nhập Phím Sếp Chọn: "
     read choice
     case $choice in
