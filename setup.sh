@@ -15,7 +15,7 @@ install_3proxy() {
     echo "installing 3proxy"
     mkdir -p /3proxy
     cd /3proxy
-    URL="https://raw.githubusercontent.com/fcsaurom/proxyv6/main/0.9.3.tar.gz"
+    URL="https://github.com/z3APA3A/3proxy/archive/0.9.3.tar.gz"
     wget -qO- $URL | bsdtar -xvf-
     cd 3proxy-0.9.3
     make -f Makefile.Linux
@@ -70,9 +70,9 @@ upload_proxy() {
     local PASS="123"
     zip --password $PASS proxy.zip proxy.txt
     URL=$(curl -F "file=@proxy.zip" https://file.io)
-    echo "Định dạng PROXY IP:PORT:LOGIN:PASS"
-    echo "Tải PROXY Tại LINK sau: ${URL}"
-    echo "PASS giải nén : ${PASS}"
+    echo "DINH DANG PROXY IP:PORT:LOGIN:PASS"
+    echo "TAI PROXY TAI LINK SAU: ${URL}"
+    echo "PASS GIAI NEN : ${PASS}"
 }
 gen_data() {
     seq $FIRST_PORT $LAST_PORT | while read port; do
